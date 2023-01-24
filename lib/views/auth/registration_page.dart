@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:weather_app/models/profile_model.dart';
 import 'package:weather_app/providers/auth_provider.dart';
+import 'package:weather_app/providers/profile_provider.dart';
 
-class RegistrationPage extends StatefulWidget {
+class RegistrationPage extends ConsumerStatefulWidget {
   const RegistrationPage({super.key});
 
   @override
-  State<RegistrationPage> createState() => _RegistrationPageState();
+  ConsumerState<RegistrationPage> createState() => _RegistrationPageState();
 }
 
-class _RegistrationPageState extends State<RegistrationPage> {
+class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   @override
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -23,12 +26,24 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void _onRegistration() async {
     if (_formKey.currentState!.validate()) {
       // TODO: Register user
+
       await AuthProvider.registration(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
-      ).then((value) {
+      ).then((value) async {
         if (value != null) {
-          Navigator.pop(context);
+          final ProfileModel profile = ProfileModel(
+            id: value.uid,
+            name: _nameController.text.trim(),
+            email: _emailController.text.trim(),
+            registeredAt: DateTime.now(),
+          );
+          await ProfileProvider.addNewProfile(profile).then((value) {
+            if (value) {
+              ref.invalidate(profileFutureProvider);
+              Navigator.pop(context);
+            }
+          });
         }
       });
     }
