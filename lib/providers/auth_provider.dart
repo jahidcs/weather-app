@@ -2,11 +2,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final authStateProvider = StreamProvider<User?>(
-  (ref) {
-    return FirebaseAuth.instance.authStateChanges();
-  },
-);
+final authStateProvider = StreamProvider<User?>((ref) {
+  return FirebaseAuth.instance.authStateChanges().map((user) {
+    ref.read(currentUserProvider.notifier).state = user;
+    return user;
+  });
+});
+
+final currentUserProvider = StateProvider<User?>((ref) {
+  return null;
+});
 
 class AuthProvider {
   static Future<User?> registration({
