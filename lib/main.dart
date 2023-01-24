@@ -4,7 +4,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weather_app/providers/auth_provider.dart';
 import 'package:weather_app/views/auth/login_page.dart';
-import 'package:weather_app/views/home_page.dart';
+import 'package:weather_app/views/wrapper.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -38,7 +38,7 @@ class LandingWidget extends ConsumerWidget {
     final authStateRef = ref.watch(authStateProvider);
     return Scaffold(
       body: authStateRef.when(
-        data: (data) => data == null ? const LoginPage() : const HomePage(),
+        data: (data) => data == null ? const LoginPage() : const Wrapper(),
         error: (error, stackTrace) => Center(child: Text(error.toString())),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
